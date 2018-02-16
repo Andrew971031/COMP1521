@@ -1,0 +1,14 @@
+Generally 
+Apart from some old useless COMP2521 content 
+- Bitwise operator
+    - Hexi-decimal 
+    - Bitwise 
+        - & operator --> AND --> 1 1 = 1 else 0 
+        - | operator --> OR --> 0 0 = 0 else 1 
+        - ^ operator --> XOR --> 1 1 = 1 , 1 0 = 1, 0 0 = 0 ;
+        - ~ operator --> NEG --> 1 is 0 
+        - << shift left number 
+        - >> shift right number
+        
+- Code in Machine language 
+
