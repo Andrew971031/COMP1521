@@ -13,20 +13,22 @@ int is_digit(char);
 void optimize(BigNum *n); 
 
 // Initialise a BigNum to N bytes, all zero
-void initBigNum(BigNum *n, int Nbytes)
+void initBigNum(BigNum * n, int Nbytes)
 {
     //init
     assert(Nbytes != 0);
     //find space in heap
-    n = (BigNum *)malloc(sizeof(BigNum)); 
+    //n = calloc(1,sizeof(BigNum)); 
     //heap has space
-    assert(n != NULL); 
+    assert(n != NULL);
+    
     //set 
     n->nbytes = Nbytes;
     //set space for main array
     n->bytes = (Byte *)malloc(Nbytes*sizeof(Byte));
     //set zero
-    memset(n->bytes,0,Nbytes);
+    memset(n->bytes,'0',Nbytes);
+    
     return;
 }
 
@@ -38,41 +40,55 @@ void addBigNums(BigNum n, BigNum m, BigNum *res)
     //new size 
     int size  = ((n.nbytes - m.nbytes) >= 0) ? n.nbytes : m.nbytes;
     
+    //is this not big enough?
     if(res->nbytes < size + 1){
         res->nbytes = size + 1;
-        //free(res->bytes);
-        res->bytes = calloc(size + 1,sizeof(Byte)); 
+        free(res->bytes); 
+        //auto set to zero
+        res->bytes = (Byte *)calloc((size + 1),sizeof(Byte)); 
+        memset(res->bytes,'0',size + 1);
     }
 
     //if more than 10 
     int up_val = 0;
 
     //check until maximum + 1, probs wont reach there 
-    while(current <= size){
-        
+    while(current <= size){ 
         //case of which one more is needed and has reached the end 
         if(current == size && up_val != 0){
             //one more size
-            res->bytes[size] = 1;
+         res->bytes[size] = '1';
             break; 
         //case of no need
         }else if(current == size && up_val == 0){
             //if not then exit
             break;
-        //case of which 
+        //General case  
         }else{
+            //2 numbers have enough length
+            if(current < n.nbytes && current < m.nbytes){
             //check buffer
-            int buffer = n.bytes[current] + m.bytes[current] + up_val;
+                int buffer = (n.bytes[current] - '0') + (m.bytes[current] - '0') + up_val;
             //more than 10 then up one
-            if(buffer >= 10){
-                res->bytes[current] = buffer - 10; 
-                up_val = 1;
+                if(buffer >= 10){
+                    char b = ((buffer - 10) + '0'); 
+                    res->bytes[current] = b; 
+                    up_val = 1;
+                }else{
+                    res->bytes[current] =(char)(buffer + '0'); 
+                    up_val = 0;
+                }
             }else{
-                res->bytes[current] = buffer; 
-                up_val = 0;
+                //dismatching length
+                if(n.nbytes > m.nbytes){
+                    res->bytes[current] = n.bytes[current]; 
+                }else{
+                    res->bytes[current] = m.bytes[current];
+                }
             }
         }
         current++;
+        //printf("0");
     }
     //reduce and optimize
     optimize(res);
@@ -115,20 +131,30 @@ int scanBigNum(char *s, BigNum *n)
                 flag = 1;
             }
         }
-        printf("0");
         //update next char
         counter++; 
         buffer = s[counter]; 
     }  
+    if(buffer == '\0') finish = counter - 1;
 
     //return straight away if not any digits
     if(flag == 0) return 0; 
     //set all digits
     counter = 0; 
-    for(int i = finish;i > start; i--){
+    //check if big enough to hold all digits 
+    if(n->nbytes < (finish - start + 1)){
+        //re-allocate
+        free(n->bytes);
+        n->bytes = calloc((finish - start + 1), sizeof(Byte));     
+        n->nbytes = finish - start + 1;
+    }
+
+    for(int i = finish;i >= start; i--){
         n->bytes[counter] = s[i];  
+        //printf("%d",n->nbytes); 
         counter++; 
     }
+    //printf("\n");
     return 1;
 }
 
@@ -147,7 +173,11 @@ void showBigNum(BigNum n)
             printf("%c",n.bytes[counter]);
             counter--;
         }else{
-            if(n.bytes[counter] != '0') flag = 1;
+            if(n.bytes[counter] != '0') {
+                flag = 1; 
+                continue;
+            }
+            counter--;
         } 
     }
     return;
@@ -163,23 +193,27 @@ void optimize(BigNum *n){
     int current = n->nbytes - 1;
     //checking.. but will not reach the end
     while(current >= 0){
-        if(is_digit(n->bytes[current])) break;
+        if(n->bytes[current] != '0') break;
         current--; 
     }
-    
-    //new pointer
-    BigNum * r = NULL; 
-    initBigNum(r,current + 1); 
+
+    char r[current + 1]; 
     //make new value
     for(int i = 0;i <= current; i++){
-        r->bytes[current] = n->bytes[current]; 
+        r[i] = n->bytes[i]; 
     }
-
-    //free old
+    //free old and optimize
     free(n->bytes); 
-    free(n);
-    //reset n 
-    n = r; 
+    //new allocation
+    n->nbytes = current + 1;
+    n->bytes = calloc((current + 1),sizeof(Byte)); 
+
+    //allocation of all chars
+    for(int i = 0;i <= current;i++){
+        n->bytes[i] = r[i]; 
+    }
 }
-
-
+//TODO
+void multiplyBigNums(BigNum n, BigNum m, BigNum *res){
+    
+}

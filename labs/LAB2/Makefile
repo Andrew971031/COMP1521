@@ -1,7 +1,7 @@
 # COMP1521 18s1 Lab02 Makefile
 
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -std=gnu99 -g
 
 add : add.o BigNum.o
 	$(CC) -o add add.o BigNum.o
