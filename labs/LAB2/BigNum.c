@@ -213,3 +213,10 @@ void optimize(BigNum *n){
         n->bytes[i] = r[i]; 
     }
 }
+<<<<<<< HEAD
+//TODO
+void multiplyBigNums(BigNum n, BigNum m, BigNum *res){
+    
+}
+=======
+>>>>>>> cf27df04bd0b6821dde433e5ebacf806ef9e4fc1
